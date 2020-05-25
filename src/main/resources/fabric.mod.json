@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "data-generator",
+  "version": "${version}",
+
+  "name": "Quartz Data Generator",
+  "description": "This mod generates data to be used to build the Quartz server implementation",
+  "authors": [
+    "Maddymakesgames"
+  ],
+  "contact": {
+    "homepage": "https://github.com/rusty-quartz/",
+    "sources": "https://github.com/rusty-quartz/data-generator"
+  },
+
+  "license": "CC0-1.0",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": []
+  },
+  "mixins": [
+    "modid.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.7.4",
+    "minecraft": "*"
+  },
+  "suggests": {
+    "flamingo": "*"
+  }
+}

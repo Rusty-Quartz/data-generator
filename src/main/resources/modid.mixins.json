@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.quartz.pickaxe.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "DataMixin",
+    "ServerMainMixin"
+  ],
+  "client": [
+    "ClientMainMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
