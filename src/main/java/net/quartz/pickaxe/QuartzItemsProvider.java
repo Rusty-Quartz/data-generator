@@ -35,7 +35,7 @@ public class QuartzItemsProvider implements DataProvider {
 			JsonObject itemJson = new JsonObject();
 
 			itemJson.addProperty("stack_size", currItem.getMaxCount());
-			itemJson.addProperty("rarity", currItem.getRarity(new ItemStack(currItem)).name().toLowerCase());
+			itemJson.addProperty("rarity", currItem.getRarity(new ItemStack(currItem)).ordinal());
 
 			if (currItem.isFood()) {
 				JsonObject foodObject = new JsonObject();
@@ -115,11 +115,13 @@ public class QuartzItemsProvider implements DataProvider {
 
 					rangedJson.addProperty("weapon_type", "bow");
 					rangedJson.addProperty("max_charge_time", bow.getMaxUseTime(ItemStack.EMPTY));
+					rangedJson.addProperty("max_durability", bow.getMaxDamage());
 				} else if (currItem instanceof CrossbowItem) {
 					CrossbowItem crossbow = (CrossbowItem) currItem;
 
 					rangedJson.addProperty("weapon_type", "crossbow");
 					rangedJson.addProperty("max_charge_time", crossbow.getMaxUseTime(ItemStack.EMPTY));
+					rangedJson.addProperty("max_durability", crossbow.getMaxDamage());
 				}
 
 				JsonObject enumType = new JsonObject();
@@ -131,6 +133,7 @@ public class QuartzItemsProvider implements DataProvider {
 
 				rangedJson.addProperty("weapon_type", "trident");
 				rangedJson.addProperty("max_charge_time", tridentItem.getMaxUseTime(ItemStack.EMPTY));
+				rangedJson.addProperty("max_durability", tridentItem.getMaxDamage());
 
 				JsonObject enumType = new JsonObject();
 				enumType.add("RawRangedWeaponInfo", rangedJson);
@@ -147,6 +150,7 @@ public class QuartzItemsProvider implements DataProvider {
 
 	private <T extends MiningToolItem> void getToolInfo(T item, JsonObject obj) {
 		obj.addProperty("attack_damage", item.getAttackDamage());
+		obj.addProperty("level", item.getMaterial().toString().toLowerCase());
 		// Why tf do I have to do this mojang
 		Object[] attackSpeed = item.getAttributeModifiers(EquipmentSlot.MAINHAND).get(EntityAttributes.GENERIC_ATTACK_SPEED).toArray();
 
@@ -155,6 +159,7 @@ public class QuartzItemsProvider implements DataProvider {
 
 	private <T extends SwordItem> void getToolInfo(T item, JsonObject obj) {
 		obj.addProperty("attack_damage", item.getAttackDamage());
+		obj.addProperty("level", item.getMaterial().toString().toLowerCase());
 		// Why tf do I have to do this mojang
 		Object[] attackSpeed = item.getAttributeModifiers(EquipmentSlot.MAINHAND).get(EntityAttributes.GENERIC_ATTACK_SPEED).toArray();
 
