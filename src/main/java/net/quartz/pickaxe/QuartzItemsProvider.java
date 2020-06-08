@@ -14,13 +14,12 @@ import net.minecraft.util.registry.Registry;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Iterator;
 
 public class QuartzItemsProvider implements DataProvider {
 
 	private DataGenerator root;
-	private static final Gson GSON = (new GsonBuilder()).setPrettyPrinting().create();
+	private static final boolean DEBUG = false;
+	private static final Gson GSON = DEBUG ? new GsonBuilder().setPrettyPrinting().create() : new GsonBuilder().create();
 
 	public QuartzItemsProvider(DataGenerator generator) {
 		root = generator;
@@ -50,9 +49,7 @@ public class QuartzItemsProvider implements DataProvider {
 				// TODO: Add Status effects once Quartz supports them
 //				foodObject.addProperty("status_effects", fc.getStatusEffects());
 
-				JsonObject enumType = new JsonObject();
-				enumType.add("RawFoodInfo", foodObject);
-				itemJson.add("info", enumType);
+				itemJson.add("info", foodObject);
 			} else if (currItem instanceof ToolItem) {
 				JsonObject toolObject = new JsonObject();
 				ToolItem tool = (ToolItem) currItem;
@@ -73,9 +70,7 @@ public class QuartzItemsProvider implements DataProvider {
 					getToolInfo((HoeItem) tool, toolObject);
 				}
 
-				JsonObject enumType = new JsonObject();
-				enumType.add("RawToolInfo", toolObject);
-				itemJson.add("info", enumType);
+				itemJson.add("info", toolObject);
 			} else if (currItem instanceof ArmorItem) {
 				ArmorItem armorItem = (ArmorItem) currItem;
 				JsonObject armorJson = new JsonObject();
@@ -98,9 +93,7 @@ public class QuartzItemsProvider implements DataProvider {
 				armorJson.addProperty("toughness", armorItem.method_26353());
 				armorJson.addProperty("max_durability", armorItem.getMaxDamage());
 
-				JsonObject enumType = new JsonObject();
-				enumType.add("RawArmorInfo", armorJson);
-				itemJson.add("info", enumType);
+				itemJson.add("info", armorJson);
 			} else if (currItem instanceof ShearsItem) addUsableInfo(currItem, itemJson, "shears");
 			else if (currItem instanceof FlintAndSteelItem) addUsableInfo(currItem, itemJson, "flint_and_steel");
 			else if (currItem instanceof OnAStickItem) {
@@ -124,9 +117,7 @@ public class QuartzItemsProvider implements DataProvider {
 					rangedJson.addProperty("max_durability", crossbow.getMaxDamage());
 				}
 
-				JsonObject enumType = new JsonObject();
-				enumType.add("RawRangedWeaponInfo", rangedJson);
-				itemJson.add("info", enumType);
+				itemJson.add("info", rangedJson);
 			} else if (currItem instanceof TridentItem) {
 				TridentItem tridentItem = (TridentItem) currItem;
 				JsonObject rangedJson = new JsonObject();
@@ -135,9 +126,7 @@ public class QuartzItemsProvider implements DataProvider {
 				rangedJson.addProperty("max_charge_time", tridentItem.getMaxUseTime(ItemStack.EMPTY));
 				rangedJson.addProperty("max_durability", tridentItem.getMaxDamage());
 
-				JsonObject enumType = new JsonObject();
-				enumType.add("RawRangedWeaponInfo", rangedJson);
-				itemJson.add("info", enumType);
+				itemJson.add("info", rangedJson);
 			}
 
 			json.add(currItem.toString(), itemJson);
@@ -172,9 +161,7 @@ public class QuartzItemsProvider implements DataProvider {
 		usableObj.addProperty("usable_type", usableType);
 		usableObj.addProperty("max_durability", item.getMaxDamage());
 
-		JsonObject enumType = new JsonObject();
-		enumType.add("RawUsableInfo", usableObj);
-		obj.add("info", enumType);
+		obj.add("info", usableObj);
 	}
 
 
