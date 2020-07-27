@@ -16,8 +16,10 @@ import java.util.Collection;
 public class DataMixin {
 	@Inject(method = "create*", at = @At("TAIL"), locals = LocalCapture.CAPTURE_FAILEXCEPTION, cancellable = true)
 	private static void create(Path output, Collection inputs, boolean includeClient, boolean includeServer, boolean includeDev, boolean includeReports, boolean arg6, CallbackInfoReturnable<DataGenerator> cir, DataGenerator dataGenerator) {
+		dataGenerator = new DataGenerator(output, inputs);
 		if(includeReports) {
 			dataGenerator.install(new QuartzItemsProvider(dataGenerator));
 		}
+		cir.setReturnValue(dataGenerator);
 	}
 }

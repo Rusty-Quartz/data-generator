@@ -16,7 +16,7 @@ public class ClientMainMixin {
 	public static void main(String[] args) {
 		LogManager.getLogger("data-generator").info("Redirecting to data generators");
 		try {
-			net.minecraft.data.Main.main(new String[]{"--all"});
+			net.minecraft.data.Main.main(new String[]{"--reports"});
 		} catch(Exception e) {
 			System.out.println("Failed to run the data main");
 			System.out.println(e);

@@ -4,13 +4,14 @@
   "package": "net.quartz.pickaxe.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "DataMixin",
-    "ServerMainMixin"
+	"BlockListProviderMixin",
+	"DataMixin",
+	"ServerMainMixin"
   ],
   "client": [
-    "ClientMainMixin"
+	"ClientMainMixin"
   ],
   "injectors": {
-    "defaultRequire": 1
+	"defaultRequire": 1
   }
 }
