@@ -28,6 +28,7 @@ public class BlockListProviderMixin {
 
 	@Mutable
 	@Shadow @Final private static Gson GSON;
+	private static int i = 0;
 
 	@Redirect(at = @At(value = "INVOKE", target = "Lcom/google/gson/JsonObject;addProperty(Ljava/lang/String;Ljava/lang/Boolean;)V", ordinal = 0), method = "run")
 	private void addProperty(JsonObject jsonObject, String property, Boolean value) {
@@ -37,6 +38,8 @@ public class BlockListProviderMixin {
 	@Inject(at = @At(value = "INVOKE", target = "Lcom/google/gson/JsonObject;addProperty(Ljava/lang/String;Ljava/lang/Boolean;)V", ordinal = 0), method = "run", locals = LocalCapture.CAPTURE_FAILEXCEPTION)
 	private void run(DataCache cache, CallbackInfo ci, JsonObject jsonObject, Iterator var3, Block block, Identifier identifier, JsonObject jsonObject2, StateManager stateManager, JsonArray jsonArray2, UnmodifiableIterator var9, BlockState blockState, JsonObject jsonObject4, JsonObject var15, String var16, Boolean var17) {
 		jsonObject2.addProperty("default", Block.getRawIdFromState(blockState));
+		jsonObject2.addProperty("interm_id", i);
+		i++;
 		GSON = (new GsonBuilder()).create();
 	}
 }
