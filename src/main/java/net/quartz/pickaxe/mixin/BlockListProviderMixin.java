@@ -31,14 +31,11 @@ public class BlockListProviderMixin {
 	@Shadow @Final private static Gson GSON;
 	private static int i = 0;
 
-	@Redirect(at = @At(value = "INVOKE", target = "Lcom/google/gson/JsonObject;addProperty(Ljava/lang/String;Ljava/lang/String;)V", ordinal = 0), method = "run")
-	private void addProperty(JsonObject jsonObject, String property, String value) {
+/
 
-	}
-
-	@Inject(at = @At(value = "INVOKE", target = "Lcom/google/gson/JsonObject;addProperty(Ljava/lang/String;Ljava/lang/String;)V", ordinal = 0), method = "run", locals = LocalCapture.CAPTURE_FAILEXCEPTION)
-	private void run(DataCache cache, CallbackInfo ci, JsonObject jsonObject, Iterator var3, Block block, Identifier identifier, JsonObject jsonObject2, StateManager stateManager, JsonArray jsonArray2, UnmodifiableIterator var9, BlockState blockState, JsonObject jsonObject4, JsonObject var15, Iterator var16, Property var17) {
-		jsonObject2.addProperty("default", Block.getRawIdFromState(blockState));
+	@Inject(at = @At(value = "INVOKE", target = "Lcom/google/gson/JsonObject;add(Ljava/lang/String;Lcom/google/gson/JsonElement;)V", ordinal = 4), method = "run", locals = LocalCapture.CAPTURE_FAILEXCEPTION)
+	private void run(DataCache cache, CallbackInfo ci, JsonObject jsonObject, Iterator var3, Block block, Identifier identifier, JsonObject jsonObject2, StateManager stateManager, JsonArray jsonArray2) {
+		jsonObject2.addProperty("default", Block.getRawIdFromState(block.getDefaultState()));
 		jsonObject2.addProperty("interm_id", i);
 		i++;
 		GSON = (new GsonBuilder()).create();
