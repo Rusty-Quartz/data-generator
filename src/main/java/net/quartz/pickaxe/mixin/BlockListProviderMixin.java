@@ -31,7 +31,7 @@ public class BlockListProviderMixin {
 	@Shadow @Final private static Gson GSON;
 	private static int i = 0;
 
-/
+
 
 	@Inject(at = @At(value = "INVOKE", target = "Lcom/google/gson/JsonObject;add(Ljava/lang/String;Lcom/google/gson/JsonElement;)V", ordinal = 4), method = "run", locals = LocalCapture.CAPTURE_FAILEXCEPTION)
 	private void run(DataCache cache, CallbackInfo ci, JsonObject jsonObject, Iterator var3, Block block, Identifier identifier, JsonObject jsonObject2, StateManager stateManager, JsonArray jsonArray2) {
