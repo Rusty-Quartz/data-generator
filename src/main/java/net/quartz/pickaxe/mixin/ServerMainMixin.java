@@ -1,5 +1,6 @@
 package net.quartz.pickaxe.mixin;
 
+import net.minecraft.obfuscate.DontObfuscate;
 import net.minecraft.server.Main;
 import org.apache.logging.log4j.LogManager;
 import org.spongepowered.asm.mixin.Mixin;
@@ -8,6 +9,10 @@ import org.spongepowered.asm.mixin.Overwrite;
 @Mixin(value = Main.class, remap = false)
 public class ServerMainMixin {
 
+	/**
+	 * @author maddymakesgames
+	 */
+	@DontObfuscate
 	@Overwrite
 	public static void main(String[] args) {
 		LogManager.getLogger("data-generator").info("Redirecting to data generators");

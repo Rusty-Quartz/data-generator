@@ -3,6 +3,7 @@ package net.quartz.pickaxe.mixin;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.main.Main;
+import net.minecraft.obfuscate.DontObfuscate;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 
@@ -12,6 +13,10 @@ import org.apache.logging.log4j.LogManager;
 @Mixin(value = Main.class, remap = false)
 public class ClientMainMixin {
 
+	/**
+	 * @author maddymakesgames
+	 */
+	@DontObfuscate
 	@Overwrite
 	public static void main(String[] args) {
 		LogManager.getLogger("data-generator").info("Redirecting to data generators");

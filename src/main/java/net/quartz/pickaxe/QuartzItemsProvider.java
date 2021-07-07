@@ -90,7 +90,7 @@ public class QuartzItemsProvider implements DataProvider {
 				}
 
 				armorJson.addProperty("protection", armorItem.getProtection());
-				armorJson.addProperty("toughness", armorItem.method_26353());
+				armorJson.addProperty("toughness", armorItem.getToughness());
 				armorJson.addProperty("max_durability", armorItem.getMaxDamage());
 
 				itemJson.add("info", armorJson);
