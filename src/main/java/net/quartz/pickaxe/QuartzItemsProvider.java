@@ -2,13 +2,16 @@ package net.quartz.pickaxe;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.data.DataCache;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.*;
 import net.minecraft.util.registry.Registry;
 
@@ -17,7 +20,7 @@ import java.nio.file.Path;
 
 public class QuartzItemsProvider implements DataProvider {
 
-	private DataGenerator root;
+	private final DataGenerator root;
 	private static final boolean DEBUG = false;
 	private static final Gson GSON = DEBUG ? new GsonBuilder().setPrettyPrinting().create() : new GsonBuilder().create();
 
@@ -34,7 +37,11 @@ public class QuartzItemsProvider implements DataProvider {
 			JsonObject itemJson = new JsonObject();
 
 			itemJson.addProperty("stack_size", currItem.getMaxCount());
-			itemJson.addProperty("rarity", currItem.getRarity(new ItemStack(currItem)).ordinal());
+			itemJson.addProperty("item_rarity", String.valueOf(new ItemStack(currItem).getRarity()));
+			itemJson.addProperty("enchantability", currItem.getEnchantability());
+			itemJson.addProperty("fireproof", currItem.isFireproof());
+			itemJson.addProperty("can_be_nested", currItem.canBeNested());
+
 
 			if (currItem.isFood()) {
 				JsonObject foodObject = new JsonObject();
@@ -44,15 +51,29 @@ public class QuartzItemsProvider implements DataProvider {
 				foodObject.addProperty("hunger", fc.getHunger());
 				foodObject.addProperty("saturation", fc.getSaturationModifier());
 				foodObject.addProperty("meat", fc.isMeat());
-				foodObject.addProperty("eat_when_full", fc.isAlwaysEdible());
+				foodObject.addProperty("always_edible", fc.isAlwaysEdible());
 				foodObject.addProperty("snack", fc.isSnack());
-				// TODO: Add Status effects once Quartz supports them
-//				foodObject.addProperty("status_effects", fc.getStatusEffects());
+
+				JsonArray statusEffects = new JsonArray();
+
+				for(Pair<StatusEffectInstance, Float> statusEffect : fc.getStatusEffects()) {
+					JsonObject currEffect = new JsonObject();
+
+					// Maybe find a way to parse the translation key?
+					// if it's an uln then we're fine but if its not then we'll probably want to translate it and then convert to snake case
+					currEffect.addProperty("name", statusEffect.getFirst().getTranslationKey());
+					currEffect.addProperty("duration", statusEffect.getFirst().getDuration());
+					currEffect.addProperty("level", statusEffect.getFirst().getAmplifier());
+					currEffect.addProperty("chance", statusEffect.getSecond());
+
+					statusEffects.add(currEffect);
+				}
+
+				foodObject.add("status_effect", statusEffects);
 
 				itemJson.add("info", foodObject);
-			} else if (currItem instanceof ToolItem) {
+			} else if (currItem instanceof ToolItem tool) {
 				JsonObject toolObject = new JsonObject();
-				ToolItem tool = (ToolItem) currItem;
 				if (tool instanceof PickaxeItem) {
 					toolObject.addProperty("tool_type", "pickaxe");
 					getToolInfo((PickaxeItem) tool, toolObject);
@@ -71,22 +92,14 @@ public class QuartzItemsProvider implements DataProvider {
 				}
 
 				itemJson.add("info", toolObject);
-			} else if (currItem instanceof ArmorItem) {
-				ArmorItem armorItem = (ArmorItem) currItem;
+			} else if (currItem instanceof ArmorItem armorItem) {
 				JsonObject armorJson = new JsonObject();
 
 				switch (armorItem.getSlotType()) {
-					case HEAD:
-						armorJson.addProperty("armor_type", "helmet");
-						break;
-					case CHEST:
-						armorJson.addProperty("armor_type", "chestplate");
-						break;
-					case LEGS:
-						armorJson.addProperty("armor_type", "leggings");
-						break;
-					case FEET:
-						armorJson.addProperty("armor_type", "boots");
+					case HEAD -> armorJson.addProperty("armor_type", "helmet");
+					case CHEST -> armorJson.addProperty("armor_type", "chestplate");
+					case LEGS -> armorJson.addProperty("armor_type", "leggings");
+					case FEET -> armorJson.addProperty("armor_type", "boots");
 				}
 
 				armorJson.addProperty("protection", armorItem.getProtection());
@@ -96,30 +109,23 @@ public class QuartzItemsProvider implements DataProvider {
 				itemJson.add("info", armorJson);
 			} else if (currItem instanceof ShearsItem) addUsableInfo(currItem, itemJson, "shears");
 			else if (currItem instanceof FlintAndSteelItem) addUsableInfo(currItem, itemJson, "flint_and_steel");
-			else if (currItem instanceof OnAStickItem) {
-				OnAStickItem onAStickItem = (OnAStickItem) currItem;
-
+			else if (currItem instanceof OnAStickItem onAStickItem) {
 				if (onAStickItem == Items.CARROT_ON_A_STICK) addUsableInfo(onAStickItem, itemJson, "carrot_stick");
 				else addUsableInfo(onAStickItem, itemJson, "fungus_stick");
 			} else if (currItem instanceof RangedWeaponItem) {
 				JsonObject rangedJson = new JsonObject();
-				if (currItem instanceof BowItem) {
-					BowItem bow = (BowItem) currItem;
-
+				if (currItem instanceof BowItem bow) {
 					rangedJson.addProperty("weapon_type", "bow");
 					rangedJson.addProperty("max_charge_time", bow.getMaxUseTime(ItemStack.EMPTY));
 					rangedJson.addProperty("max_durability", bow.getMaxDamage());
-				} else if (currItem instanceof CrossbowItem) {
-					CrossbowItem crossbow = (CrossbowItem) currItem;
-
+				} else if (currItem instanceof CrossbowItem crossbow) {
 					rangedJson.addProperty("weapon_type", "crossbow");
 					rangedJson.addProperty("max_charge_time", crossbow.getMaxUseTime(ItemStack.EMPTY));
 					rangedJson.addProperty("max_durability", crossbow.getMaxDamage());
 				}
 
 				itemJson.add("info", rangedJson);
-			} else if (currItem instanceof TridentItem) {
-				TridentItem tridentItem = (TridentItem) currItem;
+			} else if (currItem instanceof TridentItem tridentItem) {
 				JsonObject rangedJson = new JsonObject();
 
 				rangedJson.addProperty("weapon_type", "trident");
@@ -141,18 +147,22 @@ public class QuartzItemsProvider implements DataProvider {
 		obj.addProperty("attack_damage", item.getAttackDamage());
 		obj.addProperty("level", item.getMaterial().toString().toLowerCase());
 		// Why tf do I have to do this mojang
-		Object[] attackSpeed = item.getAttributeModifiers(EquipmentSlot.MAINHAND).get(EntityAttributes.GENERIC_ATTACK_SPEED).toArray();
+		EntityAttributeModifier[] attackSpeed = item.getAttributeModifiers(EquipmentSlot.MAINHAND)
+				.get(EntityAttributes.GENERIC_ATTACK_SPEED)
+				.toArray(EntityAttributeModifier[]::new);
 
-		obj.addProperty("attack_speed", ((EntityAttributeModifier)attackSpeed[0]).getValue());
+		obj.addProperty("attack_speed", attackSpeed[0].getValue() + 4.0);
 	}
 
 	private <T extends SwordItem> void getToolInfo(T item, JsonObject obj) {
 		obj.addProperty("attack_damage", item.getAttackDamage());
 		obj.addProperty("level", item.getMaterial().toString().toLowerCase());
 		// Why tf do I have to do this mojang
-		Object[] attackSpeed = item.getAttributeModifiers(EquipmentSlot.MAINHAND).get(EntityAttributes.GENERIC_ATTACK_SPEED).toArray();
+		EntityAttributeModifier[] attackSpeed = item.getAttributeModifiers(EquipmentSlot.MAINHAND)
+				.get(EntityAttributes.GENERIC_ATTACK_SPEED)
+				.toArray(EntityAttributeModifier[]::new);
 
-		obj.addProperty("attack_speed", ((EntityAttributeModifier)attackSpeed[0]).getValue());
+		obj.addProperty("attack_speed", attackSpeed[0].getValue() + 4.0);
 	}
 
 	private void addUsableInfo(Item item, JsonObject obj, String usableType) {
